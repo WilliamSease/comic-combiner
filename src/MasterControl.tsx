@@ -15,7 +15,7 @@ export const MasterControl = (props: IProps) => {
 
             const extractedFilesArray: File[] = [];
             const wasmBinary = await (
-                await fetch('./assets/unrar.wasm', { credentials: 'same-origin' })
+                await fetch('./unrar.wasm', { credentials: 'same-origin' })
             ).arrayBuffer();
 
             let masterIdx = 0;
@@ -37,11 +37,11 @@ export const MasterControl = (props: IProps) => {
                 } else if (archive.name.endsWith('.cbr') || archive.name.endsWith('.rar')) {
                     pushProgress(`UnRAR ${archive.name}...`)
                     try {
-
-                    let extractor = await createExtractorFromData({ wasmBinary: wasmBinary, data:await archive.arrayBuffer() });
+                    let extractor = await createExtractorFromData({ wasmBinary: wasmBinary, data:await archive.arrayBuffer()});
                     const { fileHeaders } = extractor.getFileList();
                     let tempFiles: File[] = [];
                     for (const fileHeader of fileHeaders) {
+                        console.info(fileHeader)
                         let content = extractor.extract({files:[fileHeader.name]})
                         for (const file of content.files) {
                             tempFiles.push(new File([new Blob([file.extraction ?? ""])], fileHeader.name))
