@@ -18,7 +18,7 @@ export const PathSelect = (props: IProps) => {
                     out.push(file);
                 }
             }
-            updateMasterFileList(out.filter((file) => file.name.endsWith('.cbz')))
+            updateMasterFileList(out.filter((file) => file.name.endsWith('.cbz') || file.name.endsWith('.cbr')))
             return out;
         }
     }, [selectedDirectory, updateMasterFileList])
