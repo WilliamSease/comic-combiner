@@ -14,6 +14,9 @@ export const MasterControl = (props: IProps) => {
         <button onClick={async () => {
 
             const extractedFilesArray: File[] = [];
+            const wasmBinary = await (
+                await fetch('./assets/unrar.wasm', { credentials: 'same-origin' })
+            ).arrayBuffer();
 
             let masterIdx = 0;
 
@@ -31,16 +34,25 @@ export const MasterControl = (props: IProps) => {
 
                     }
                     pushProgress(`Done!`)
-                } else if (archive.name.endsWith('.cbr')) {
+                } else if (archive.name.endsWith('.cbr') || archive.name.endsWith('.rar')) {
                     pushProgress(`UnRAR ${archive.name}...`)
-                    pushProgress(`Don't support UNRAR (yet) (hopefully)`)
-                    pushProgress(`FAILURE`);
-                    pushProgress(`FAILURE`)
-                    pushProgress(`FAILURE`)
-                    pushProgress(`FAILURE`)
+                    try {
 
-                    let extractor = await createExtractorFromData({wasmBinary:undefined, data:await archive.arrayBuffer(),password:undefined})
-                    console.info(extractor.getFileList())
+                    let extractor = await createExtractorFromData({ wasmBinary: wasmBinary, data:await archive.arrayBuffer() });
+                    const { fileHeaders } = extractor.getFileList();
+                    let tempFiles: File[] = [];
+                    for (const fileHeader of fileHeaders) {
+                        let content = extractor.extract({files:[fileHeader.name]})
+                        for (const file of content.files) {
+                            tempFiles.push(new File([new Blob([file.extraction ?? ""])], fileHeader.name))
+                        }
+                    }
+                    extractedFilesArray.push(...tempFiles.sort((a,b) => a.name.localeCompare(b.name)))
+                } catch (err) {
+                    console.error(err)
+                    pushProgress("ERROR!:")
+                    pushProgress(JSON.stringify(err))
+                }
                 }
                 else {
                     console.error("Not an archive")

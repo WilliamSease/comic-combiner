@@ -1,12 +1,10 @@
 import { isNil } from 'lodash';
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useState } from 'react';
 
 type IProps = {
     updateMasterFileList: (files: File[]) => void;
 }
-
-const rarErrMsg = "This tool does NOT yet support .cbr files (which are RAR files). I need to create a WASM binary for the c++ implementation of unrar. I'm working on it. For now this file is ignored. I reccomend using Calibre to convert your library to .cbz as workaround."
 
 export const PathSelect = (props: IProps) => {
     const { updateMasterFileList } = props;
@@ -20,7 +18,7 @@ export const PathSelect = (props: IProps) => {
                     out.push(file);
                 }
             }
-            updateMasterFileList(out.filter((file) => file.name.endsWith('.cbz') || file.name.endsWith('.cbr')))
+            updateMasterFileList(out.filter((file) => file.name.endsWith('.cbz') || file.name.endsWith('.cbr') || file.name.endsWith('.rar')))
             return out;
         }
     }, [selectedDirectory, updateMasterFileList])
@@ -38,22 +36,14 @@ export const PathSelect = (props: IProps) => {
 
     return (
         <>
-            <input style={{ marginLeft: 5 }} type="file" ref={ref} onChange={(e) => {
+            <input style={{ marginLeft: 5 }} type="file" ref={ref} onChange={useCallback((e: { target: { files: React.SetStateAction<FileList | null>; }; }) => {
                 setSelectedDirectory(e.target.files)
-            }} />
+            },[setSelectedDirectory])} />
 
             <div style={{ flexGrow: 1, marginLeft: 5 }}>
                 {fileList?.map((val) => {
-                    if (val.name.endsWith(".cbz")) {
+                    if (val.name.endsWith(".cbz") || val.name.endsWith('.cbr') || val.name.endsWith(".rar")) {
                         return (<div style={{ color: 'green', fontWeight: "bold" }}>{val.name}</div>)
-                    }
-                    if (val.name.endsWith(".cbr")) {
-                        return (<>
-                            <div style={{ color: 'red' }}>{val.name}</div>
-                            <div style={{ color: 'red', fontWeight: "bold" }}>
-                                {rarErrMsg}
-                            </div>
-                        </>)
                     }
                     return <div style={{ color: 'black' }}>{val.name}</div>
                 })}
