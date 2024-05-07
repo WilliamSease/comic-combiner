@@ -6,6 +6,8 @@ type IProps = {
     updateMasterFileList: (files: File[]) => void;
 }
 
+const rarErrMsg = "This tool does NOT yet support .cbr files (which are RAR files). I need to create a WASM binary for the c++ implementation of unrar. I'm working on it. For now this file is ignored. I reccomend using Calibre to convert your library to .cbz as workaround."
+
 export const PathSelect = (props: IProps) => {
     const { updateMasterFileList } = props;
     const [selectedDirectory, setSelectedDirectory] = useState<FileList | null>(null);
@@ -49,12 +51,9 @@ export const PathSelect = (props: IProps) => {
                         return (<>
                             <div style={{ color: 'red' }}>{val.name}</div>
                             <div style={{ color: 'red', fontWeight: "bold" }}>
-                                {"This tool does NOT support .cbr files, which are RAR files and require proprietary RAR technology to open, and are rare at any rate. Use Calibre to convert your library to .cbz files. This file will be ignored."}
+                                {rarErrMsg}
                             </div>
                         </>)
-                    }
-                    if (val.name.endsWith(".cbz")) {
-                        return (<div style={{ color: 'green' }}>{val.name}</div>)
                     }
                     return <div style={{ color: 'black' }}>{val.name}</div>
                 })}

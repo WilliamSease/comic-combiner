@@ -1,4 +1,5 @@
 import JSZip from 'jszip';
+import { createExtractorFromData } from 'node-unrar-js';
 
 type IProps = {
     masterFileList: File[];
@@ -37,6 +38,9 @@ export const MasterControl = (props: IProps) => {
                     pushProgress(`FAILURE`)
                     pushProgress(`FAILURE`)
                     pushProgress(`FAILURE`)
+
+                    let extractor = await createExtractorFromData({wasmBinary:undefined, data:await archive.arrayBuffer(),password:undefined})
+                    console.info(extractor.getFileList())
                 }
                 else {
                     console.error("Not an archive")
